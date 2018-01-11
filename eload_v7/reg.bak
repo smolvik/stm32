@@ -1,0 +1,186 @@
+/**********************************************************************
+ * 
+ * Regulator module
+ * 
+ *********************************************************************/
+ 
+#include "stm32f4xx.h"
+#include "modbus_rtu.h"
+
+#define NCAB 16
+
+volatile uint16_t Voffset = 50;
+//volatile uint16_t Voffset = 0;   // 
+volatile uint16_t Vsignal = 850;
+
+int32_t  Ki = 25;
+int32_t  Kp = 200;
+
+int32_t  Ir = 1550; //2.5A
+int32_t  Ic;
+uint32_t Rp = 100;
+
+uint32_t Vd = 0;
+int32_t  Error = 0;
+int32_t Katt = 0;
+
+// pi regulator for channel1
+int32_t update_reg_ch1(int32_t e)
+{
+	int32_t acur = 0;
+	static int32_t apre = 0;
+	int32_t u = 0;
+		
+	acur = apre + e*Ki;
+	
+	(acur > 1000000000) && (acur = 1000000000);
+	(acur < -1000000000) && (acur = -1000000000);
+	
+	u = acur + Kp*e;
+	apre = acur;
+	
+	return u;
+}
+
+// pi regulator for channel2
+int32_t update_reg_ch2(int32_t e)
+{
+	int32_t acur = 0;
+	static int32_t apre = 0;
+	int32_t u = 0;
+		
+	acur = apre + e*Ki;
+	
+	(acur > 1000000000) && (acur = 1000000000);
+	(acur < -1000000000) && (acur = -1000000000);
+	
+	u = acur + Kp*e;
+	apre = acur;
+	
+	return u;
+}
+
+void fet_down()
+{
+	DAC->DHR12R2 = 4000;
+	DAC->DHR12R1 = 0;
+}
+
+void out_dac(int32_t u)
+{
+	// set offset
+	dac_offset_set(Voffset);
+	// set signal
+	DAC->DHR12R1 = u;
+}
+
+int32_t get_current_ch1()
+{
+	return (4095 - (uint32_t)ADC1->DR);
+}
+
+int32_t get_current_ch2()
+{
+	return (4095 - (uint32_t)ADC2->DR);
+}
+
+uint32_t get_voltage()
+{
+	uint32_t v = (uint32_t)ADC3->DR;
+	uint32_t vcode = v << Katt;
+	static uint32_t catt = 0;
+	
+	if(((catt++) & 0xff) == 0)
+	{
+		(v < 1500) && (Katt--);
+		(v > 4000) && (Katt++);
+		(Katt > 8) && (Katt = 8);
+		(Katt < 0) && (Katt = 0);
+		
+		uint32_t b = GPIOD->ODR;
+		b = 0xff << Katt;
+		GPIOD->ODR = 0xff & b;		
+	}
+					
+	return vcode;			
+}
+
+void update_vmeter(int32_t v)
+{
+	static int32_t vab[NCAB];
+	static uint32_t vabi = 0;	
+	
+	Vd = Vd + v - vab[vabi];
+	vab[vabi] = v;
+	vabi = (vabi+1)&(NCAB-1);
+}
+
+void update_imeter(int32_t c)
+{
+	static int32_t cab[NCAB];
+	static uint32_t cabi = 0;	
+	
+	Ic = Ic + c - cab[cabi];
+	cab[cabi] = c;
+	cabi = (cabi+1)&(NCAB-1);			
+}
+
+void ADC_IRQHandler(void)
+{
+/*
+		// constant resistance
+		int32_t e;
+		int32_t u;
+			
+		GPIOD->ODR |= GPIO_ODR_ODR_12;
+		
+		Vd = get_voltage();
+		
+		Rp = register_tab[1];
+	
+		//Ir = (Vd*111)/10000; // 10 OHm
+		Ir = (Vd*108)/Rp-5; // mOhm
+		e = Ir - get_current();		
+		u = update_pi(e);
+		
+		register_tab[2] = e;
+		
+		(u<0) && (u = 0);
+		out_dac(u >> 9);
+
+		
+		GPIOD->ODR &= ~GPIO_ODR_ODR_12;		
+*/
+
+
+		// constant current
+		int32_t e;
+		int32_t u;
+		
+		int32_t c;		
+		int32_t v;
+		
+		//GPIOD->ODR |= GPIO_ODR_ODR_12;
+		
+		Ir = register_tab[0]*135 + (register_tab[0] >> 1) + (register_tab[0] >> 2);
+			
+		v = get_voltage();
+		update_vmeter(v);
+		
+		c = get_current_ch1();
+		update_imeter(c);
+		
+		e = Ir - c;
+		u = update_reg_ch1(e);
+		register_tab[2] = e;
+		
+		(u<0) && (u = 0);		
+		TIM4->CCR1 = Voffset;
+		DAC->DHR12R1 = u;		
+		//out_dac(u >> 9);		
+		//out_dac(Vsignal);
+		
+		//GPIOD->ODR &= ~GPIO_ODR_ODR_12;
+		
+
+}

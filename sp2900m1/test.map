@@ -1,0 +1,555 @@
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+RAM              0x20000000         0x00020000         xrw
+FLASH            0x08000000         0x00100000         xr
+*default*        0x00000000         0xffffffff
+
+Linker script and memory map
+
+
+.text           0x08000000     0x3b84
+                0x08000000                . = ALIGN (0x4)
+ *(.interrupt_vector)
+ .interrupt_vector
+                0x08000000      0x188 startup.o
+                0x08000000                table_interrupt_vector
+ *(.text)
+ .text          0x08000188      0x3d8 main.o
+                0x08000188                display_out
+                0x08000230                log_channel
+                0x08000364                load_set_INT
+                0x0800038c                load_set_PROP
+                0x080003b4                load_set_mode
+                0x080003dc                load_set_curr
+                0x08000404                rev_bit
+                0x08000464                main
+ .text          0x08000560      0x444 system.o
+                0x080005fc                clock_PLL
+                0x08000784                clock_HSE
+                0x08000848                systimer_init
+                0x0800086c                system_init
+                0x0800095c                sleep
+                0x08000988                SysTick_Handler
+ .text          0x080009a4       0x68 startup.o
+                0x080009a4                Reset_Handler
+                0x080009a4                handler_reset
+                0x08000a04                RTC_Alarm_IRQHandler
+                0x08000a04                HASH_RNG_IRQHandler
+                0x08000a04                EXTI2_IRQHandler
+                0x08000a04                TIM8_CC_IRQHandler
+                0x08000a04                DebugMon_Handler
+                0x08000a04                TIM1_CC_IRQHandler
+                0x08000a04                DMA2_Stream5_IRQHandler
+                0x08000a04                HardFault_Handler
+                0x08000a04                DMA1_Stream5_IRQHandler
+                0x08000a04                PVD_IRQHandler
+                0x08000a04                SDIO_IRQHandler
+                0x08000a04                TAMP_STAMP_IRQHandler
+                0x08000a04                PendSV_Handler
+                0x08000a04                NMI_Handler
+                0x08000a04                CAN2_RX1_IRQHandler
+                0x08000a04                EXTI3_IRQHandler
+                0x08000a04                TIM8_TRG_COM_TIM14_IRQHandler
+                0x08000a04                TIM1_UP_TIM10_IRQHandler
+                0x08000a04                TIM8_UP_TIM13_IRQHandler
+                0x08000a04                I2C3_ER_IRQHandler
+                0x08000a04                EXTI0_IRQHandler
+                0x08000a04                I2C2_EV_IRQHandler
+                0x08000a04                DMA1_Stream2_IRQHandler
+                0x08000a04                CAN1_RX0_IRQHandler
+                0x08000a04                FPU_IRQHandler
+                0x08000a04                OTG_HS_WKUP_IRQHandler
+                0x08000a04                UsageFault_Handler
+                0x08000a04                CAN2_SCE_IRQHandler
+                0x08000a04                DMA2_Stream2_IRQHandler
+                0x08000a04                TIM6_DAC_IRQHandler
+                0x08000a04                TIM1_BRK_TIM9_IRQHandler
+                0x08000a04                DCMI_IRQHandler
+                0x08000a04                CAN2_RX0_IRQHandler
+                0x08000a04                DMA2_Stream3_IRQHandler
+                0x08000a04                default_handler
+                0x08000a04                USART6_IRQHandler
+                0x08000a04                CRYP_IRQHandler
+                0x08000a04                CAN1_RX1_IRQHandler
+                0x08000a04                UART5_IRQHandler
+                0x08000a04                DMA2_Stream0_IRQHandler
+                0x08000a04                TIM4_IRQHandler
+                0x08000a04                DMA1_Stream6_IRQHandler
+                0x08000a04                DMA1_Stream1_IRQHandler
+                0x08000a04                RCC_IRQHandler
+                0x08000a04                TIM8_BRK_TIM12_IRQHandler
+                0x08000a04                EXTI15_10_IRQHandler
+                0x08000a04                DMA1_Stream7_IRQHandler
+                0x08000a04                TIM7_IRQHandler
+                0x08000a04                CAN2_TX_IRQHandler
+                0x08000a04                TIM5_IRQHandler
+                0x08000a04                DMA2_Stream7_IRQHandler
+                0x08000a04                I2C3_EV_IRQHandler
+                0x08000a04                EXTI9_5_IRQHandler
+                0x08000a04                RTC_WKUP_IRQHandler
+                0x08000a04                ETH_WKUP_IRQHandler
+                0x08000a04                SPI2_IRQHandler
+                0x08000a04                OTG_HS_EP1_IN_IRQHandler
+                0x08000a04                MemManage_Handler
+                0x08000a04                DMA1_Stream0_IRQHandler
+                0x08000a04                CAN1_TX_IRQHandler
+                0x08000a04                SVC_Handler
+                0x08000a04                EXTI4_IRQHandler
+                0x08000a04                FSMC_IRQHandler
+                0x08000a04                ETH_IRQHandler
+                0x08000a04                OTG_HS_EP1_OUT_IRQHandler
+                0x08000a04                WWDG_IRQHandler
+                0x08000a04                OTG_FS_WKUP_IRQHandler
+                0x08000a04                TIM1_TRG_COM_TIM11_IRQHandler
+                0x08000a04                OTG_HS_IRQHandler
+                0x08000a04                EXTI1_IRQHandler
+                0x08000a04                USART2_IRQHandler
+                0x08000a04                I2C2_ER_IRQHandler
+                0x08000a04                DMA2_Stream1_IRQHandler
+                0x08000a04                CAN1_SCE_IRQHandler
+                0x08000a04                FLASH_IRQHandler
+                0x08000a04                DMA2_Stream4_IRQHandler
+                0x08000a04                BusFault_Handler
+                0x08000a04                USART1_IRQHandler
+                0x08000a04                OTG_FS_IRQHandler
+                0x08000a04                SPI3_IRQHandler
+                0x08000a04                DMA2_Stream6_IRQHandler
+                0x08000a04                DMA1_Stream3_IRQHandler
+ .text          0x08000a0c      0x3e0 uart.o
+                0x08000a3c                uart_init
+                0x08000b20                uart_putch
+                0x08000b88                uart_send
+                0x08000c24                uart_send_str
+                0x08000cd8                uart_read
+                0x08000d54                UART4_IRQHandler
+ .text          0x08000dec      0x768 xprintf.o
+                0x08000dec                xputc
+                0x08000e3c                xputs
+                0x08000e64                xfputs
+                0x08001194                xprintf
+                0x080011b8                xsprintf
+                0x080011f4                xfprintf
+                0x08001230                put_dump
+                0x08001324                xgets
+                0x080013c8                xfgets
+                0x08001400                xatoi
+ .text          0x08001554      0x31c adc.o
+                0x08001584                adc_common_init
+                0x080015ac                adc1_init
+                0x08001664                adc2_init
+                0x080016e4                adc3_init
+                0x08001764                adc_set_trigger
+                0x08001828                adc_init
+                0x08001864                TIM2_IRQHandler
+ .text          0x08001870      0x164 dac.o
+                0x08001870                offset_pwm_init
+                0x08001948                dac_init
+                0x080019b4                dac_offset_set
+ .text          0x080019d4        0x0 cos_sin_tbl.o
+ .text          0x080019d4      0x520 modbus_rtu.o
+                0x08001a04                start_trans
+                0x08001a5c                modbus_init
+                0x08001b68                USART3_IRQHandler
+                0x08001c90                modbus_read_holding_registers
+                0x08001d3c                modbus_write_single_register
+ .text          0x08001ef4       0x74 crc.o
+                0x08001ef4                crc16
+ .text          0x08001f68      0xa1c spi.o
+                0x08001f98                init_spi_dma
+                0x08002080                coll_pwm_set
+                0x080020ac                ind_pwm_init
+                0x080021d4                spi_master_init
+                0x08002344                spi_slave_init
+                0x080023d4                spi_write_read
+                0x08002494                SPI1_IRQHandler
+                0x080024d0                check_current
+                0x08002524                set_refcurrent
+                0x080025cc                check_voltage
+                0x0800261c                update_mode
+                0x0800271c                check_temp
+                0x080027d4                TIM3_IRQHandler
+                0x08002958                DMA1_Stream4_IRQHandler
+ .text          0x08002984      0x104 reg.o
+                0x08002984                reg_init
+                0x080029a4                ADC_IRQHandler
+ .text          0x08002a88      0x4e4 i2c.o
+                0x08002ab8                i2c_init
+                0x08002bb0                i2c_test
+                0x08002d50                I2C1_EV_IRQHandler
+                0x08002d60                I2C1_ER_IRQHandler
+                0x08002d8c                btf_conf
+                0x08002de0                raddr_conf
+                0x08002e30                rsb_conf
+                0x08002e70                pntr_tx_end
+                0x08002eac                wadr_conf
+                0x08002ee4                sb_conf
+                0x08002f1c                i2c_start
+ .text          0x08002f6c       0xdc attenuator.o
+                0x08002f6c                update_attenuator
+                0x08003008                set_attenuator
+ .text          0x08003048        0x0 apl602.o
+ *(.text*)
+ *(.rodata)
+ .rodata        0x08003048       0x94 main.o
+                0x08003048                seg7_tbl
+ .rodata        0x080030dc       0x20 xprintf.o
+ .rodata        0x080030fc       0x80 cos_sin_tbl.o
+                0x080030fc                cos_table
+ .rodata        0x0800317c       0x20 spi.o
+                0x0800317c                kc
+                0x08003180                kr
+                0x08003184                kv
+                0x08003188                ac
+                0x0800318c                ar
+                0x08003190                av
+                0x08003194                temp_sens_addr
+                0x08003198                Rt
+ .rodata        0x0800319c       0x88 i2c.o
+ .rodata        0x08003224      0x960 apl602.o
+                0x08003224                apl602_imax
+ *(.rodata*)
+                0x08003b84                . = ALIGN (0x4)
+                0x08003b84                _data_flash = .
+
+.glue_7         0x08003b84        0x0
+ .glue_7        0x08003b84        0x0 linker stubs
+
+.glue_7t        0x08003b84        0x0
+ .glue_7t       0x08003b84        0x0 linker stubs
+
+.vfp11_veneer   0x08003b84        0x0
+ .vfp11_veneer  0x08003b84        0x0 linker stubs
+
+.v4_bx          0x08003b84        0x0
+ .v4_bx         0x08003b84        0x0 linker stubs
+
+.iplt           0x08003b84        0x0
+ .iplt          0x08003b84        0x0 main.o
+
+.rel.dyn        0x08003b84        0x0
+ .rel.iplt      0x08003b84        0x0 main.o
+
+.data           0x20000000      0x218 load address 0x08003b84
+                0x20000000                . = ALIGN (0x4)
+                0x20000000                _data_begin = .
+ *(.data)
+ .data          0x20000000        0x8 main.o
+                0x20000000                test_pwm
+                0x20000002                test_dac
+                0x20000004                vdiv
+ .data          0x20000008        0x0 system.o
+ .data          0x20000008        0x0 startup.o
+ .data          0x20000008        0x0 uart.o
+ .data          0x20000008        0x0 xprintf.o
+ .data          0x20000008        0x0 adc.o
+ .data          0x20000008        0x0 dac.o
+ .data          0x20000008        0x0 cos_sin_tbl.o
+ .data          0x20000008        0x4 modbus_rtu.o
+                0x20000008                modbus_ready
+ .data          0x2000000c      0x200 crc.o
+                0x2000000c                crc_table_low
+                0x2000010c                crc_table_high
+ .data          0x2000020c        0x0 spi.o
+ .data          0x2000020c        0x8 reg.o
+                0x2000020c                Ki
+                0x20000210                Vsignal
+ .data          0x20000214        0x1 i2c.o
+                0x20000214                i2c_address
+ .data          0x20000215        0x0 attenuator.o
+ .data          0x20000215        0x0 apl602.o
+ *(.data*)
+                0x20000218                . = ALIGN (0x4)
+ *fill*         0x20000215        0x3 
+                0x20000218                _data_end = .
+
+.igot.plt       0x20000218        0x0 load address 0x08003d9c
+ .igot.plt      0x20000218        0x0 main.o
+
+.bss            0x20000218     0x2ac0 load address 0x08003d9c
+                0x20000218                . = ALIGN (0x4)
+                0x20000218                _bss_begin = .
+                0x20000218                __bss_start__ = _bss_begin
+ *(.bss)
+ .bss           0x20000218       0x20 main.o
+                0x20000218                atten
+                0x2000021c                fDerating
+                0x20000220                fOverheat
+                0x20000224                Imax
+                0x20000228                Vdav
+                0x2000022c                Idav
+                0x20000230                Pdav
+                0x20000234                Tj
+ .bss           0x20000238        0x4 system.o
+                0x20000238                system_time
+ .bss           0x2000023c        0x0 startup.o
+ .bss           0x2000023c      0x810 uart.o
+                0x2000023c                tx_buf
+                0x2000063c                tx_idx
+                0x20000640                tx_wr_idx
+                0x20000644                rx_buf
+                0x20000a44                rx_idx
+                0x20000a48                rx_rd_idx
+ .bss           0x20000a4c        0xc xprintf.o
+                0x20000a4c                xfunc_out
+                0x20000a54                xfunc_in
+ .bss           0x20000a58        0x0 adc.o
+ .bss           0x20000a58        0x0 dac.o
+ .bss           0x20000a58        0x0 cos_sin_tbl.o
+ .bss           0x20000a58      0x224 modbus_rtu.o
+                0x20000a58                register_tab
+                0x20000a68                modbus_error
+                0x20000a6c                rx_buffer
+                0x20000b6c                rx_index
+                0x20000b70                rx_size
+                0x20000b74                tx_buffer
+                0x20000c74                tx_index
+                0x20000c78                tx_numbytes
+ .bss           0x20000c7c        0x0 crc.o
+ .bss           0x20000c7c       0x20 spi.o
+                0x20000c7c                sbuf
+                0x20000c84                spi_rx_ready
+                0x20000c88                spi_rx_byte
+                0x20000c8a                encoderA
+                0x20000c8c                encoderB
+                0x20000c8e                encoderB_prev
+                0x20000c90                enc_cnt
+                0x20000c92                enc_dir_p
+                0x20000c94                enc_dir_m
+ .bss           0x20000c9c     0x2028 reg.o
+                0x20000c9c                Vd
+                0x20001ca4                Ic1
+                0x20002cac                Ir1
+                0x20002cb4                Kp
+                0x20002cb8                Voffset
+                0x20002cbc                Error
+                0x20002cc0                temperature
+ .bss           0x20002cc4       0x10 i2c.o
+                0x20002cc4                temp_buf
+                0x20002ccc                i2c_fsm_prc
+                0x20002cd0                i2c_errcnt
+ .bss           0x20002cd4        0x4 attenuator.o
+                0x20002cd4                Katt
+ .bss           0x20002cd8        0x0 apl602.o
+ *(.bss*)
+ *(COMMON)
+                0x20002cd8                . = ALIGN (0x4)
+                0x20002cd8                _bss_end = .
+                0x20002cd8                __bss_end__ = _bss_end
+                0x00000400                _stack_size = 0x400
+                0x20020000                _stack_end = (ORIGIN (RAM) + 0x20000)
+                0x2001fc00                _stack_begin = (_stack_end - _stack_size)
+                0x2001fc00                . = _stack_begin
+
+._stack         0x20002cd8      0x400 load address 0x0800685c
+                0x200030d8                . = (. + _stack_size)
+ *fill*         0x20002cd8      0x400 
+LOAD main.o
+LOAD system.o
+LOAD startup.o
+LOAD uart.o
+LOAD xprintf.o
+LOAD adc.o
+LOAD dac.o
+LOAD cos_sin_tbl.o
+LOAD modbus_rtu.o
+LOAD crc.o
+LOAD spi.o
+LOAD reg.o
+LOAD i2c.o
+LOAD attenuator.o
+LOAD apl602.o
+START GROUP
+LOAD /usr/lib/gcc/arm-none-eabi/4.8/armv7e-m//libgcc.a
+LOAD /usr/lib/arm-none-eabi/lib/armv7e-m//libm.a
+LOAD ../STM32F4xx_DSP_StdPeriph_Lib_V1.7.0/Libraries/CMSIS/Lib/GCC//libarm_cortexM4l_math.a
+END GROUP
+OUTPUT(test.elf elf32-littlearm)
+
+.debug_info     0x00000000     0x5ef3
+ .debug_info    0x00000000      0x625 main.o
+ .debug_info    0x00000625      0xa46 system.o
+ .debug_info    0x0000106b       0xec startup.o
+ .debug_info    0x00001157      0x92c uart.o
+ .debug_info    0x00001a83      0x4c9 xprintf.o
+ .debug_info    0x00001f4c      0xa8e adc.o
+ .debug_info    0x000029da      0x621 dac.o
+ .debug_info    0x00002ffb       0x52 cos_sin_tbl.o
+ .debug_info    0x0000304d      0x9ed modbus_rtu.o
+ .debug_info    0x00003a3a       0xe6 crc.o
+ .debug_info    0x00003b20      0xf2d spi.o
+ .debug_info    0x00004a4d      0x786 reg.o
+ .debug_info    0x000051d3      0x986 i2c.o
+ .debug_info    0x00005b59      0x2e1 attenuator.o
+ .debug_info    0x00005e3a       0xb9 apl602.o
+
+.debug_abbrev   0x00000000     0x14b9
+ .debug_abbrev  0x00000000      0x1cd main.o
+ .debug_abbrev  0x000001cd      0x1af system.o
+ .debug_abbrev  0x0000037c       0xab startup.o
+ .debug_abbrev  0x00000427      0x1a6 uart.o
+ .debug_abbrev  0x000005cd      0x194 xprintf.o
+ .debug_abbrev  0x00000761      0x150 adc.o
+ .debug_abbrev  0x000008b1       0xee dac.o
+ .debug_abbrev  0x0000099f       0x50 cos_sin_tbl.o
+ .debug_abbrev  0x000009ef      0x1de modbus_rtu.o
+ .debug_abbrev  0x00000bcd       0x9f crc.o
+ .debug_abbrev  0x00000c6c      0x29c spi.o
+ .debug_abbrev  0x00000f08      0x1e8 reg.o
+ .debug_abbrev  0x000010f0      0x25a i2c.o
+ .debug_abbrev  0x0000134a       0xfa attenuator.o
+ .debug_abbrev  0x00001444       0x75 apl602.o
+
+.debug_aranges  0x00000000      0x1d0
+ .debug_aranges
+                0x00000000       0x20 main.o
+ .debug_aranges
+                0x00000020       0x20 system.o
+ .debug_aranges
+                0x00000040       0x20 startup.o
+ .debug_aranges
+                0x00000060       0x20 uart.o
+ .debug_aranges
+                0x00000080       0x20 xprintf.o
+ .debug_aranges
+                0x000000a0       0x20 adc.o
+ .debug_aranges
+                0x000000c0       0x20 dac.o
+ .debug_aranges
+                0x000000e0       0x18 cos_sin_tbl.o
+ .debug_aranges
+                0x000000f8       0x20 modbus_rtu.o
+ .debug_aranges
+                0x00000118       0x20 crc.o
+ .debug_aranges
+                0x00000138       0x20 spi.o
+ .debug_aranges
+                0x00000158       0x20 reg.o
+ .debug_aranges
+                0x00000178       0x20 i2c.o
+ .debug_aranges
+                0x00000198       0x20 attenuator.o
+ .debug_aranges
+                0x000001b8       0x18 apl602.o
+
+.debug_line     0x00000000     0x1528
+ .debug_line    0x00000000      0x1d7 main.o
+ .debug_line    0x000001d7      0x1b2 system.o
+ .debug_line    0x00000389       0x51 startup.o
+ .debug_line    0x000003da      0x18d uart.o
+ .debug_line    0x00000567      0x2c4 xprintf.o
+ .debug_line    0x0000082b      0x16d adc.o
+ .debug_line    0x00000998      0x136 dac.o
+ .debug_line    0x00000ace       0x2e cos_sin_tbl.o
+ .debug_line    0x00000afc      0x1b4 modbus_rtu.o
+ .debug_line    0x00000cb0       0x55 crc.o
+ .debug_line    0x00000d05      0x29c spi.o
+ .debug_line    0x00000fa1      0x1b9 reg.o
+ .debug_line    0x0000115a      0x1c7 i2c.o
+ .debug_line    0x00001321      0x15b attenuator.o
+ .debug_line    0x0000147c       0xac apl602.o
+
+.debug_str      0x00000000     0x12c0
+ .debug_str     0x00000000      0x342 main.o
+                                0x397 (size before relaxing)
+ .debug_str     0x00000342      0x6c7 system.o
+                                0x931 (size before relaxing)
+ .debug_str     0x00000a09       0x93 startup.o
+                                0x131 (size before relaxing)
+ .debug_str     0x00000a9c       0xa1 uart.o
+                                0x87c (size before relaxing)
+ .debug_str     0x00000b3d       0x9a xprintf.o
+                                0x18b (size before relaxing)
+ .debug_str     0x00000bd7      0x162 adc.o
+                                0x947 (size before relaxing)
+ .debug_str     0x00000d39       0x88 dac.o
+                                0x3bc (size before relaxing)
+ .debug_str     0x00000dc1       0x18 cos_sin_tbl.o
+                                 0xa4 (size before relaxing)
+ .debug_str     0x00000dd9       0xf5 modbus_rtu.o
+                                0x907 (size before relaxing)
+ .debug_str     0x00000ece       0x38 crc.o
+                                 0xe5 (size before relaxing)
+ .debug_str     0x00000f06      0x1ac spi.o
+                                0xaec (size before relaxing)
+ .debug_str     0x000010b2      0x108 reg.o
+                                0x3b1 (size before relaxing)
+ .debug_str     0x000011ba       0xcf i2c.o
+                                0x8e2 (size before relaxing)
+ .debug_str     0x00001289       0x2e attenuator.o
+                                0x1fb (size before relaxing)
+ .debug_str     0x000012b7        0x9 apl602.o
+                                0x143 (size before relaxing)
+
+.comment        0x00000000       0x2d
+ .comment       0x00000000       0x2d main.o
+                                 0x2e (size before relaxing)
+ .comment       0x0000002d       0x2e system.o
+ .comment       0x0000002d       0x2e startup.o
+ .comment       0x0000002d       0x2e uart.o
+ .comment       0x0000002d       0x2e xprintf.o
+ .comment       0x0000002d       0x2e adc.o
+ .comment       0x0000002d       0x2e dac.o
+ .comment       0x0000002d       0x2e cos_sin_tbl.o
+ .comment       0x0000002d       0x2e modbus_rtu.o
+ .comment       0x0000002d       0x2e crc.o
+ .comment       0x0000002d       0x2e spi.o
+ .comment       0x0000002d       0x2e reg.o
+ .comment       0x0000002d       0x2e i2c.o
+ .comment       0x0000002d       0x2e attenuator.o
+ .comment       0x0000002d       0x2e apl602.o
+
+.ARM.attributes
+                0x00000000       0x33
+ .ARM.attributes
+                0x00000000       0x33 main.o
+ .ARM.attributes
+                0x00000033       0x33 system.o
+ .ARM.attributes
+                0x00000066       0x33 startup.o
+ .ARM.attributes
+                0x00000099       0x33 uart.o
+ .ARM.attributes
+                0x000000cc       0x33 xprintf.o
+ .ARM.attributes
+                0x000000ff       0x33 adc.o
+ .ARM.attributes
+                0x00000132       0x33 dac.o
+ .ARM.attributes
+                0x00000165       0x33 cos_sin_tbl.o
+ .ARM.attributes
+                0x00000198       0x33 modbus_rtu.o
+ .ARM.attributes
+                0x000001cb       0x33 crc.o
+ .ARM.attributes
+                0x000001fe       0x33 spi.o
+ .ARM.attributes
+                0x00000231       0x2f reg.o
+ .ARM.attributes
+                0x00000260       0x33 i2c.o
+ .ARM.attributes
+                0x00000293       0x33 attenuator.o
+ .ARM.attributes
+                0x000002c6       0x33 apl602.o
+
+.debug_frame    0x00000000      0xa58
+ .debug_frame   0x00000000      0x108 main.o
+ .debug_frame   0x00000108       0xe0 system.o
+ .debug_frame   0x000001e8       0x48 startup.o
+ .debug_frame   0x00000230       0xd0 uart.o
+ .debug_frame   0x00000300      0x184 xprintf.o
+ .debug_frame   0x00000484       0xd8 adc.o
+ .debug_frame   0x0000055c       0x60 dac.o
+ .debug_frame   0x000005bc       0xe4 modbus_rtu.o
+ .debug_frame   0x000006a0       0x2c crc.o
+ .debug_frame   0x000006cc      0x1ac spi.o
+ .debug_frame   0x00000878       0x4c reg.o
+ .debug_frame   0x000008c4      0x14c i2c.o
+ .debug_frame   0x00000a10       0x48 attenuator.o
+
+.debug_loc      0x00000000      0x16e
+ .debug_loc     0x00000000      0x16e reg.o
+
+.debug_ranges   0x00000000      0x140
+ .debug_ranges  0x00000000      0x140 reg.o

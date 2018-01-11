@@ -1,0 +1,54 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1251">
+<link href="style.css" rel="stylesheet">
+<title>Миг-Авто. Покраска автомобилей</title>
+<script>
+function getXmlHttp()
+{
+	var xmlhttp;
+
+	if (window.XMLHttpRequest) 
+	{
+		//Firefox, Opera, IE7, and other browsers will use the native object
+		xmlhttp = new XMLHttpRequest();
+	} else 
+	{
+		//IE 5 and 6 will use the ActiveX control
+		xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+	}
+	return xmlhttp;
+}
+ 
+function updreg(){
+	var xmlHttp = getXmlHttp();
+	var sw = document.getElementById('bit0').checked;
+	
+	xmlHttp.open( "GET", "/cgi-bin/updreg?bit0="+sw, true );
+	xmlHttp.onreadystatechange = function() {
+		if(xmlHttp.readyState == 4){
+			if(xmlHttp.status == 200){
+				//alert(ledst);
+				var buf = xmlHttp.responseText.split(',');
+				//document.getElementById('registers').innerHTML = xmlHttp.responseText;	
+				document.getElementById('registers').innerHTML = buf;
+				document.getElementById('bit1').checked = (buf[1]=="true") ? true : false;
+				setTimeout(updreg, 1000);
+			}
+		}
+	};
+	
+	xmlHttp.send( null );	
+}
+
+</script> 
+</head>
+<body id="prices" onload = 'updreg()'>
+<div id="registers"></div>
+<div><input type='checkbox' id='bit0'>bit0 - local switch</div>
+<div><input type='checkbox' id='bit1'>bit1 - remote led</div>
+<div><input type='checkbox' id='bit2'>bit2</div>
+<div><input type='checkbox' id='bit3'>bit3</div>
+</body> 
+</html>

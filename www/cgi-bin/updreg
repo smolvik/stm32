@@ -1,0 +1,34 @@
+#!/usr/bin/perl
+
+$| = 1;
+
+print STDERR "start updreg\n";
+
+# read data from file
+open($fd, "<", "registers") or die "can't open file: $!";
+@bits = <$fd>;
+close $fd;
+chomp @bits;
+
+# parse query
+$query = $ENV{'QUERY_STRING'};
+#$query = shift;
+if($query){
+	@buf = split /,/,$query;
+	for(@buf){(/^bit(\d+)=(.*)/) and ($bits[$1] = $2);}
+
+	# update file	
+	open($fd, ">", "registers") or die "can't open file for write: $!";
+	for(@bits){print $fd $_."\n";}
+	close $fd;
+	print STDERR "registers has been updated\n";	
+	
+}
+
+# make message for client
+for(@bits){$mes .= $_.",";}
+$mes_len = length $mes;
+
+print "Content-type: text/html; charset=utf-8\n";
+print "Content-length: $mes_len\n\n";
+print $mes;

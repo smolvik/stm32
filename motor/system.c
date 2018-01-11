@@ -1,0 +1,148 @@
+#include "stm32f10x.h"
+#include "led.h"
+#include "sin_table.h"
+
+// output mode: push-pull + 50MHz
+#define OUTPUT_MODE     (0x03) 
+#define SYS_TICKS	9000 // 1ms
+
+uint32_t system_time = 0;
+uint32_t system_but = 0;
+volatile uint32_t freq = 30;
+
+void system_init (void)
+{
+	// enable HSE high speed external oscillator
+	RCC->CR |= RCC_CR_HSEON;
+	while (!(RCC->CR & RCC_CR_HSERDY)) {};
+		
+	// setting PLL
+	RCC->CFGR &= ~((RCC_CFGR_PLLSRC|RCC_CFGR_PLLXTPRE|RCC_CFGR_PLLMULL));
+	RCC->CFGR |= RCC_CFGR_PLLSRC_HSE;       // Тактировать PLL от HSE (8 MHz).
+	RCC->CFGR |= RCC_CFGR_PLLMULL9;         // Умножать частоту на 9 (8*9=72 MHz).
+	RCC->CFGR &= ~RCC_CFGR_USBPRE;			// USB Device prescaler 1.5 72*1.5 = 48 MHz
+	
+	RCC->CR |= RCC_CR_PLLON;                // Запустить PLL.
+	while ((RCC->CR & RCC_CR_PLLRDY)==0) {} // Ожидание готовности PLL.
+
+	FLASH->ACR |= FLASH_ACR_PRFTBE;         // Enable Prefetch Buffer.
+	FLASH->ACR &= ~FLASH_ACR_LATENCY;       // Предочистка.
+    FLASH->ACR |= FLASH_ACR_LATENCY_2;      // Если 48< SystemCoreClock <= 72, пропускать 2 такта.	
+    
+	RCC->CFGR |= RCC_CFGR_PPRE1_DIV2;		// APB1 clock = 72/2 = 36 MHz
+	    
+    // system clocking       
+    RCC->CFGR &=~RCC_CFGR_SW;              						// Очистить биты SW0, SW1.
+	RCC->CFGR |= RCC_CFGR_SW_PLL;           					// Тактирование с выхода PLL.
+	while ((RCC->CFGR & RCC_CFGR_SWS) != RCC_CFGR_SWS_PLL) {} 	// Ожидание переключения на PLL 
+	
+	RCC->APB2ENR |= (RCC_APB2ENR_IOPAEN | RCC_APB2ENR_AFIOEN);  // PA enable and alternate 
+																// functions of the ports enable
+																
+    RCC->APB1ENR |= RCC_APB1ENR_USBEN; 							// usb enable
+    RCC->APB2ENR |= RCC_APB2ENR_USART1EN;  						// uart1 enable
+    RCC->APB1ENR |= RCC_APB1ENR_USART2EN; 						// uart2 enable
+
+	//enable clock on TIM1 GPIOA GPIOB GPIOC peripheral
+    RCC->APB2ENR |= (RCC_APB2ENR_AFIOEN | RCC_APB2ENR_TIM1EN | 
+			RCC_APB2ENR_IOPAEN | RCC_APB2ENR_IOPBEN | RCC_APB2ENR_IOPCEN);
+			
+	// setting outputs for PWM out
+	// PA8 - TIM_CH1, PA9 - TIM_CH2, PA10 - TIM_CH3 
+	// push-pull 50MHz alter out
+	GPIOA->CRH &= ~(GPIO_CRH_MODE8 | GPIO_CRH_CNF8 | 
+					GPIO_CRH_MODE9 | GPIO_CRH_CNF9 |
+					GPIO_CRH_MODE10 | GPIO_CRH_CNF10);					
+	GPIOA->CRH |=  (GPIO_CRH_CNF8_1 | GPIO_CRH_MODE8_0 | GPIO_CRH_MODE8_1 |
+					GPIO_CRH_CNF9_1 | GPIO_CRH_MODE9_0 | GPIO_CRH_MODE9_1 |
+					GPIO_CRH_CNF10_1 | GPIO_CRH_MODE10_0 | GPIO_CRH_MODE10_1);
+					
+	// PB13 - TIM_CH1N, PB14 - TIM_CH2N, PB15 - TIM_CH3N
+	// push-pull 50MHz alter out
+	GPIOB->CRH &= ~(GPIO_CRH_MODE13 | GPIO_CRH_CNF13 |
+					GPIO_CRH_MODE14 | GPIO_CRH_CNF14 |
+					GPIO_CRH_MODE15 | GPIO_CRH_CNF15);
+	GPIOB->CRH |=  (GPIO_CRH_CNF13_1 | GPIO_CRH_MODE13_0 | GPIO_CRH_MODE13_1 |
+					GPIO_CRH_CNF14_1 | GPIO_CRH_MODE14_0 | GPIO_CRH_MODE14_1 |
+					GPIO_CRH_CNF15_1 | GPIO_CRH_MODE15_0 | GPIO_CRH_MODE15_1);
+					
+	// TIM1
+    // time base
+	TIM1->PSC = 70 - 1; // prescaller gets ~1MHz
+	TIM1->ARR = 1024;   // period ~1KHz
+	TIM1->CCR1 = 512;   // duty cicle on channel 1 50%
+	
+	TIM1->CR1 = 0x0000;
+	TIM1->CR1 |= (TIM_CR1_ARPE | TIM_CR1_CKD_1 | TIM_CR1_URS);
+	
+	// pwm outputs
+	TIM1->CCMR1 = 0x0000;
+	TIM1->CCMR1 |= (TIM_CCMR1_OC1M_1 | TIM_CCMR1_OC1M_2 | TIM_CCMR1_OC1PE); //PWM mode 1 channel 1 preload enabled
+	
+	TIM1->CCER = 0x0000;
+	TIM1->CCER |= (TIM_CCER_CC1E | TIM_CCER_CC1NE);		// output enable
+	
+	// break and dead time setting
+	TIM1->BDTR = 0x0000;
+	TIM1->BDTR |= (TIM_BDTR_MOE | TIM_BDTR_DTG_7 | TIM_BDTR_DTG_6 | TIM_BDTR_DTG_5 | 
+					TIM_BDTR_DTG_4 | TIM_BDTR_DTG_3 | TIM_BDTR_DTG_2 | TIM_BDTR_DTG_1 | TIM_BDTR_DTG_0);
+					
+	//TIM1->RCR = 16;
+	TIM1->DIER |= TIM_DIER_UIE; // enable update int
+	NVIC_EnableIRQ(TIM1_UP_IRQn);
+	
+	TIM1->CR1 |= TIM_CR1_CEN;     // start TIM1
+/*
+	// set sys tick timer
+	SysTick->LOAD  = (SYS_TICKS-1);      		   // set reload register 
+	SysTick->VAL   = 0;                            // Load the SysTick Counter Value 
+	SysTick->CTRL  = SysTick_CTRL_TICKINT_Msk |    // Enable SysTick IRQ and SysTick Timer 
+                     SysTick_CTRL_ENABLE_Msk;      // freq for sync = freq cpu/8    
+*/
+                     
+    // ext line interrupts
+	EXTI->IMR |= EXTI_IMR_MR4;  				// enable interrupt from line4
+	EXTI->RTSR |= EXTI_RTSR_TR4; 				// enable rising trigger for line4
+	
+	AFIO->EXTICR[1] &= ~AFIO_EXTICR2_EXTI4_PB;	// map port PB4 to line4
+	AFIO->EXTICR[1] |= AFIO_EXTICR2_EXTI4_PB;	//
+	
+	NVIC_EnableIRQ(EXTI4_IRQn);					// enable int exti4
+}
+
+void SysTick_Handler(void)
+{
+	// every 1 ms
+	system_time ++;
+}
+
+EXTI4_IRQHandler()
+{
+	static int fd = 1;
+	
+	if(EXTI->PR & EXTI_PR_PR4)
+	{
+		EXTI->PR |= EXTI_PR_PR4; 
+		//led_tog();
+		system_but ^= 0x01;
+		
+		(freq == 100) && (fd = -1);
+		(freq == 0) && (fd = 1);
+		freq += fd;
+		
+	}	
+}
+
+void TIM1_UP_IRQHandler()
+{
+	static int phase = 0;
+	
+	TIM1->CCR1 = sin_tbl[phase];
+	phase = (phase+freq)&( OSC_PERIOD-1 );
+		
+	TIM1->SR &= ~TIM_SR_UIF;
+	//led_tog();
+	
+	if(phase > OSC_PERIOD/2) led_on();
+	else led_off();
+}

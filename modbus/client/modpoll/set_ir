@@ -1,0 +1,5 @@
+#!/bin/sh
+
+# test read holding registers
+
+./modpoll -b 115200 -d 8 -s 1 -p none -m rtu -1 -a 17 -r 1 /dev/ttyS0 $1
